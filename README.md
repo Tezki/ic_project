@@ -4,23 +4,24 @@ Implementation of the ISA (Induction of Subgoal Automata) algorithm presented in
 1. [Installation](#installation)
     1. [Install Python packages](#install-python)
     1. [Install `ILASP` and `clingo` binaries](#install-ilasp-clingo)
-    1. [Install Graphviz](#install-graphviz)
+    1. [Install additional dependencies](#install-additional-dependencies)
 1. [Run the algorithm](#running-isa)
 1. [Generation of configuration files](#config-file-generator)
 1. [Plot the learning curves](#plot-results)
 1. [Collect learning statistics](#collect-stats)
 1. [Reproducibility of the paper results](#result-reproducibility)
+1. [Citation](#citation)
 1. [References](#references)
 
 ## <a name="installation"></a>Installation
-The code only runs on Linux or MacOS (Intel) computers with Python 3. Firstly, you have to download the repository which can be
+The code only runs on Linux or MacOS computers with Python 3. Firstly, you have to download the repository which can be
 done with the following command.
 ```
 git clone https://github.com/ertsiger/induction-subgoal-automata-rl.git
 ```
 
 The following subsections describe the steps for installing the required [Python packages](#install-python) and the [binaries](#install-ilasp-clingo) related to the
-Inductive Logic Programming system.
+Inductive Logic Programming system we use to learn the automata. Other dependencies you may need to install are listed [here](#install-additional-dependencies).
 
 ### <a name="install-python"></a> Install Python packages
 To install the required Python packages to run our code, you can use `pip` with the following command:
@@ -34,7 +35,8 @@ Note that one of the requirements is the package in the `gym-subgoal-automata` r
 We use the environments implemented in that repository. 
 
 We recommend you to use a [virtual environment](https://docs.python.org/3/tutorial/venv.html) 
-since the requirements of our installation may affect your current installation.
+since the requirements of our installation may affect your current installation. In our case, we used an Anaconda3
+installation and created an environment with Python 3.6.9.
 
 ### <a name="install-ilasp-clingo"></a> Install `ILASP` and `clingo` binaries
 The cloned repository does not include the binaries for the ILASP inductive logic programming system. Therefore, you have
@@ -44,10 +46,28 @@ to download the binaries from the following websites and then copy the
 * [clingo 5.4.0](https://github.com/potassco/clingo/releases/tag/v5.4.0)
 
 Alternatively, you can run the `install_binaries.sh`, which will
-download  and put the files in the `bin` folder for you.
+download and put the files in the `bin` folder for you. If you are using MacOS, you may need to install `wget` first using `brew install wget`.
+```
+cd induction-subgoal-automata-rl
+./install_binaries.sh
+```
 
-### <a name="install-graphviz"></a> Install Graphviz
+### <a name="install-additional-dependencies"></a> Install additional dependencies
+#### Graphviz
 The learned subgoal automata are exported to `.png` using Graphviz. You can follow the instructions in the [official webpage](https://graphviz.org/download/) to install it.
+
+#### SDL2
+When installing the [Python packages](#install-python), you may experience the error `fatal error: 'SDL.h' file not found`. To resolve this, you must install SDL2 (Simple Direct Media Layer 2):
+* Ubuntu [[link](https://stackoverflow.com/questions/10488775/sdl-h-no-such-file-or-directory-found-when-compiling)]: `sudo apt-get install libsdl2-dev`
+* MacOS [[link](https://stackoverflow.com/questions/45992243/pip-install-pygame-sdl-h-file-not-found)]: `brew install sdl sdl_image sdl_mixer sdl_ttf portmidi`
+
+If you use a Conda environment, the following command can also be used to avoid a system-wide installation: `conda install -c conda-forge sdl2` [[link](https://anaconda.org/conda-forge/sdl2)].
+
+#### MacOS dependencies
+The code invoking `ILASP` relies on the `timeout` command, which is not available by default in MacOS systems. To install it, you can run:
+```
+brew install coreutils
+```
 
 ## <a name="running-isa"></a>Running the algorithm
 The ISA algorithm can be executed easily by running the `run_isa.py` script:
@@ -254,6 +274,23 @@ RL algorithms are evaluated in `OfficeWorld`.
 
 Since it is costly to run all these experiments, we recommend you to use the configuration generator introduced [here](#config-file-generator)
 if you want to test the method with some specific experiments.
+
+## <a name="citation"></a>Citation
+If you find this repository useful in your work, please use the following citation:
+```
+@article{FurelosBlancoLJBR21,
+  author       = {Daniel Furelos{-}Blanco and
+                  Mark Law and
+                  Anders Jonsson and
+                  Krysia Broda and
+                  Alessandra Russo},
+  title        = {{Induction and Exploitation of Subgoal Automata for Reinforcement Learning}},
+  journal      = {J. Artif. Intell. Res.},
+  volume       = {70},
+  pages        = {1031--1116},
+  year         = {2021}
+}
+```
 
 ## <a name="references"></a>References
 * Toro Icarte, R.; Klassen, T. Q.; Valenzano, R. A.; and McIlraith, S. A. 2018. [_Using Reward Machines for High-Level Task Specification and Decomposition in Reinforcement Learning_](http://proceedings.mlr.press/v80/icarte18a.html). Proceedings of the 35th International Conference on Machine Learning.
