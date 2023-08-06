@@ -10,8 +10,8 @@ ILASP_OPERATION_SOLVE = "solve"
 ILASP_OPERATION_SEARCH_SPACE = "search_space"
 
 
-def solve_ilasp_task(ilasp_problem_filename, output_filename, version="2", max_body_literals=1, use_simple=True,
-                     timeout=60*35, binary_folder_name=None, compute_minimal=False, operation=ILASP_OPERATION_SOLVE):
+def solve_ilasp_task(ilasp_problem_filename, output_filename, version="4", max_body_literals=3,
+                     timeout=60*10, binary_folder_name=None, compute_minimal=False, operation=ILASP_OPERATION_SOLVE):
     with open(output_filename, 'w') as f:
         arguments = []
         if timeout is not None:
@@ -22,17 +22,12 @@ def solve_ilasp_task(ilasp_problem_filename, output_filename, version="2", max_b
         else:
             ilasp_binary_path = os.path.join(binary_folder_name, ILASP_BINARY_NAME)
 
-        # other flags: -d -ni -ng -np
         arguments.extend([ilasp_binary_path,
                           "--version=" + version,  # test 2 and 2i
-                          "--strict-types",
-                          "-nc",  # omit constraints from the search space
+                          "--max-rule-length=4" + str(max_body_literals+1),
                           "-ml=" + str(max_body_literals),
                           ilasp_problem_filename
                           ])
-
-        if use_simple:
-            arguments.append("--simple")  # simplify the representations of contexts
 
         if binary_folder_name is not None:
             arguments.append("--clingo")
