@@ -24,14 +24,16 @@ def parse_ilasp_solutions(ilasp_learnt_filename):
                     edges[current_edge] = []
     
             elif line.startswith(REJ_STR): # rej_cond
-                rej_cond.append(parse_reject_rule(line))
+                rej_cond = parse_reject_rule(line)
 
-        automaton.add_state("u_rej")
+        if len(rej_cond) != 0:
+            automaton.add_state("u_rej")
         for edge in edges:
             from_state, to_state = edge[0], edge[1]
             automaton.add_state(from_state)
             automaton.add_state(to_state)
             automaton.add_edge(from_state, to_state, edges[edge])
-            automaton.add_edge(from_state, "u_rej", rej_cond)
+            if len(rej_cond) != 0:
+                automaton.add_edge(from_state, "u_rej", [rej_cond])
 
         return automaton
