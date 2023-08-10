@@ -1,4 +1,4 @@
-from ilasp.ilasp_common import TRANSITION_STR, CONNECTED_STR
+from ilasp.ilasp_common import TRANSITION_STR, CONNECTED_STR, REJ_STR
 
 def generate_knowledgebase(num_states, rejecting_state, predicates, observables, learn_explicit):
     kb = ""
@@ -6,8 +6,8 @@ def generate_knowledgebase(num_states, rejecting_state, predicates, observables,
     knowledgebase = _generate_type_predicates(predicates, observables)
     if learn_explicit:
         knowledgebase += _generate_eq(predicates)
-    knowledgebase += _generate_rej_condition_assumptions(num_states, rejecting_state)
-
+    if rejecting_state is not None:
+        knowledgebase += _generate_rej_condition_assumptions(num_states, rejecting_state)
     return knowledgebase
 
 
@@ -32,6 +32,6 @@ def _generate_rej_condition_assumptions(num_states, rejecting_state):
     if rejecting_state is not None:
         for i in range(num_states - 2):
             stmt += "%s(u%d, %s).\n" % (CONNECTED_STR, i, rejecting_state)
-            stmt += "%s(u%d, %s, T) :- rej_cond(T).\n" % (TRANSITION_STR, i, rejecting_state)
+            stmt += "%s(u%d, %s, T) :- %s(T).\n" % (TRANSITION_STR, i, rejecting_state, REJ_STR)
     
     return stmt

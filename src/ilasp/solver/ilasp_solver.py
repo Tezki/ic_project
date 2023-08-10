@@ -29,11 +29,6 @@ def solve_ilasp_task(ilasp_problem_filename, output_filename, version="4", max_b
                           ilasp_problem_filename
                           ])
 
-        if binary_folder_name is not None:
-            arguments.append("--clingo")
-            clingo_binary = CLINGO_MINIMAL_BINARY_NAME if compute_minimal else CLINGO_BINARY_NAME
-            arguments.append("\"" + os.path.join(binary_folder_name, clingo_binary) + "\"")
-
         if operation == ILASP_OPERATION_SEARCH_SPACE:
             arguments.append("-s")
 

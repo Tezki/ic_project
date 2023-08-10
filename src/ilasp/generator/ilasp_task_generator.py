@@ -2,7 +2,7 @@ import os
 from ilasp.generator.utils.ilasp_task_generator_example import generate_examples
 from ilasp.generator.utils.ilasp_task_generator_state import generate_state_statements
 from ilasp.generator.utils.ilasp_task_generator_transition import generate_timestep_statements, generate_state_at_timestep_statements, generate_transition_statements
-from ilasp.generator.utils.ilasp_task_generator_knowlegebase import generate_knowledgebase
+from ilasp.generator.utils.ilasp_task_generator_knowledgebase import generate_knowledgebase
 from ilasp.generator.utils.ilasp_task_generator_mode import generate_constant_statements, generate_mode_bias
 
 
@@ -31,7 +31,7 @@ def _generate_ilasp_task_str(num_states, accepting_state, rejecting_state, predi
     task += generate_knowledgebase(num_states, rejecting_state, predicates, observables, learn_explicit)
 
     task += generate_constant_statements(num_states, accepting_state, rejecting_state, observables, learn_explicit)
-    task += generate_mode_bias(predicates, num_variables, learn_explicit)
+    task += generate_mode_bias(predicates, rejecting_state, num_variables, learn_explicit)
     
     task += generate_examples(goal_examples, dend_examples, inc_examples)
 
