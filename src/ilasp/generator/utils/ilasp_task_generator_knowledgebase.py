@@ -3,7 +3,7 @@ from ilasp.ilasp_common import TRANSITION_STR, CONNECTED_STR, REJ_STR
 def generate_knowledgebase(num_states, rejecting_state, predicates, observables, learn_explicit):
     kb = ""
 
-    knowledgebase = _generate_type_predicates(predicates, observables)
+    knowledgebase = generate_type_predicates(predicates, observables)
     if learn_explicit:
         knowledgebase += _generate_eq(predicates)
     if rejecting_state is not None:
@@ -11,7 +11,7 @@ def generate_knowledgebase(num_states, rejecting_state, predicates, observables,
     return knowledgebase
 
 
-def _generate_type_predicates(predicates, observables):
+def generate_type_predicates(predicates, observables):
     typeKnowledge = ""
     for i in range(len(predicates)):
         for obs in observables[i]:

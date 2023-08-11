@@ -35,5 +35,8 @@ def parse_ilasp_solutions(ilasp_learnt_filename):
             automaton.add_edge(from_state, to_state, edges[edge])
             if len(rej_cond) != 0:
                 automaton.add_edge(from_state, "u_rej", [rej_cond])
+        
+        if len(rej_cond) != 0:
+            automaton.add_edge("u_rej", "u_rej", [rej_cond])
 
         return automaton

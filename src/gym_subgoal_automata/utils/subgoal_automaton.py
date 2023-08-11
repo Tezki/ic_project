@@ -210,14 +210,17 @@ class SubgoalAutomaton:
         # render the resulting Graphviz graph
         dot.render(filename)
 
-    def get_next_state(self, current_state, observations):
+    def get_next_state(self, current_state, observations, predicates, observables):
         """
         Returns the next state given the current state and the current observations. If no condition
         to a next state holds, then the next state will be the current state.
         """
         candidate_states = set()
+        rej_cond = None
+        if self.reject_state is not None:
+            rej_cond = self.edges[self.reject_state][0][0].condition[0]
         for condition, candidate_state in self.edges[current_state]:
-            if condition.is_satisfied(observations):
+            if condition.is_satisfied(observations, predicates, observables, rej_cond):
                 candidate_states.add(candidate_state)
 
         if len(candidate_states) > 1:
@@ -337,33 +340,33 @@ class SubgoalAutomaton:
         return self.edges[state][edge_id][0]
 
 
-# Usage example
-if __name__ == "__main__":
-    dfa = SubgoalAutomaton()
-    dfa.add_state("u0")
-    dfa.add_state("u1")
-    dfa.add_state("uA")
-    dfa.add_state("uR")
-    dfa.set_initial_state("u0")
-    dfa.set_accept_state("uA")
-    dfa.set_reject_state("uR")
+# # Usage example
+# if __name__ == "__main__":
+#     dfa = SubgoalAutomaton()
+#     dfa.add_state("u0")
+#     dfa.add_state("u1")
+#     dfa.add_state("uA")
+#     dfa.add_state("uR")
+#     dfa.set_initial_state("u0")
+#     dfa.set_accept_state("uA")
+#     dfa.set_reject_state("uR")
 
-    dfa.add_edge("u0", "u1", ["f", "~g"])
-    dfa.add_edge("u0", "uA", ["f", "g"])
-    dfa.add_edge("u0", "uR", ["n", "~f", "~g"])
-    dfa.add_edge("u1", "uA", ["g"])
-    dfa.add_edge("u1", "uR", ["n", "~g"])
+#     dfa.add_edge("u0", "u1", ["f", "~g"])
+#     dfa.add_edge("u0", "uA", ["f", "g"])
+#     dfa.add_edge("u0", "uR", ["n", "~f", "~g"])
+#     dfa.add_edge("u1", "uA", ["g"])
+#     dfa.add_edge("u1", "uR", ["n", "~g"])
 
-    # dfa.plot(".", "output.png")
+#     # dfa.plot(".", "output.png")
 
-    print("(u0, [f]) -->", dfa.get_next_state("u0", ["f"]))
-    print("(u0, [a]) -->", dfa.get_next_state("u0", ["a"]))
-    print("(u0, [g,f]) -->", dfa.get_next_state("u0", ["g", "f"]))
-    print("(u0, [n]) -->", dfa.get_next_state("u0", ["n"]))
-    print("(u1, [g,a,b]) -->", dfa.get_next_state("u1", ["g", "a", "b"]))
-    print("(u1, [n]) -->", dfa.get_next_state("u1", ["n"]))
+#     print("(u0, [f]) -->", dfa.get_next_state("u0", ["f"]))
+#     print("(u0, [a]) -->", dfa.get_next_state("u0", ["a"]))
+#     print("(u0, [g,f]) -->", dfa.get_next_state("u0", ["g", "f"]))
+#     print("(u0, [n]) -->", dfa.get_next_state("u0", ["n"]))
+#     print("(u1, [g,a,b]) -->", dfa.get_next_state("u1", ["g", "a", "b"]))
+#     print("(u1, [n]) -->", dfa.get_next_state("u1", ["n"]))
 
-    print("min_dist(u0, uA) =", dfa.get_distance("u0", "uA", "min_distance"))
-    # print("max_dist(u0, uA) =", dfa.get_distance("u0", "uA", "max_distance"))
+#     print("min_dist(u0, uA) =", dfa.get_distance("u0", "uA", "min_distance"))
+#     # print("max_dist(u0, uA) =", dfa.get_distance("u0", "uA", "max_distance"))
 
-    print("Conditions:", dfa.get_all_conditions())
+#     print("Conditions:", dfa.get_all_conditions())
