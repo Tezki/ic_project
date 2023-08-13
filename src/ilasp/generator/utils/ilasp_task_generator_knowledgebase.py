@@ -5,7 +5,7 @@ def generate_knowledgebase(num_states, rejecting_state, predicates, observables,
 
     knowledgebase = generate_type_predicates(predicates, observables)
     if learn_explicit:
-        knowledgebase += _generate_eq(predicates)
+        knowledgebase += generate_eq(predicates)
     if rejecting_state is not None:
         knowledgebase += _generate_rej_condition_assumptions(num_states, rejecting_state)
     return knowledgebase
@@ -19,7 +19,7 @@ def generate_type_predicates(predicates, observables):
         typeKnowledge += "\n"
     return typeKnowledge
 
-def _generate_eq(predicates):
+def generate_eq(predicates):
     rules = ""
     for i in range(len(predicates)):
         for j in range(len(predicates)):

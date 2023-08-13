@@ -1,7 +1,8 @@
 from collections import namedtuple
 
 import clingo
-from ilasp.generator.utils.ilasp_task_generator_knowledgebase import generate_type_predicates
+from ilasp.generator.utils.ilasp_task_generator_knowledgebase import generate_type_predicates, generate_eq
+from ilasp.ilasp_common import OBS_STR
 
 Condition = namedtuple("Condition", "condition")
 
@@ -17,8 +18,9 @@ class EdgeCondition(Condition):
             ctl = clingo.Control(logger=lambda *args: None)
 
             for obs in observations:
-                ctl.add("base", [], f"{obs}.")
+                ctl.add("base", [], f"{OBS_STR}({obs},0).")
             ctl.add("base", [], generate_type_predicates(predicates, observables))
+            ctl.add("base", [], generate_eq(predicates))
             if rej_cond is not None:
                 ctl.add("base", [], f"rej_cond(V1) :- {rej_cond}.")
             ctl.add("base", [], f"sat :- {cond}.")
