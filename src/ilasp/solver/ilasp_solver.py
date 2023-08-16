@@ -11,7 +11,7 @@ ILASP_OPERATION_SEARCH_SPACE = "search_space"
 
 
 def solve_ilasp_task(ilasp_problem_filename, output_filename, version="4", max_body_literals=3,
-                     timeout=60*10, binary_folder_name=None, compute_minimal=False, operation=ILASP_OPERATION_SOLVE):
+                     timeout=60*10, binary_folder_name=None, operation=ILASP_OPERATION_SOLVE):
     with open(output_filename, 'w') as f:
         arguments = []
         if timeout is not None:

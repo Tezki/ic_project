@@ -64,7 +64,7 @@ def get_longest_example_length(goal_examples, dend_examples, inc_examples):
     return max(max_goal, max_dend, max_inc)
 
 def get_max_single_step_observations(goal_examples, dend_examples, inc_examples):
-    max_goal = max([len(max(goal_examples[i], key=len)) for i in range(len(goal_examples))]) if len(goal_examples) > 0 else 0
-    max_dend = max([len(max(dend_examples[i], key=len)) for i in range(len(dend_examples))]) if len(dend_examples) > 0 else 0
-    max_inc = max([len(max(inc_examples[i], key=len)) for i in range(len(inc_examples))]) if len(inc_examples) > 0 else 0
+    max_goal = max([len(max(list(goal_examples)[i], key=len)) for i in range(len(goal_examples))]) if len(goal_examples) > 0 else 0
+    max_dend = max([len(max(list(dend_examples)[i], key=len)) for i in range(len(dend_examples))]) if len(dend_examples) > 0 else 0
+    max_inc = max([len(max(list(inc_examples)[i], key=len)) for i in range(len(inc_examples))]) if len(inc_examples) > 0 else 0
     return max(max_goal, max_dend, max_inc)

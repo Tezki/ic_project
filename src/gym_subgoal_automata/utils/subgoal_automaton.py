@@ -106,6 +106,12 @@ class SubgoalAutomaton:
     def is_terminal_transition(self, from_state, to_state):
         """Returns True the 'from' state is not terminal and the 'to' state is a terminal state."""
         return self.is_accepting_transition(from_state, to_state) or self.is_rejecting_transition(from_state, to_state)
+    
+    def get_rej_cond(self):
+        if self.reject_state is not None:
+            if self.reject_state in self.edges:
+                return self.edges[self.reject_state][0][0].condition[0]
+        return None
 
     def plot(self, plot_folder, filename, use_subprocess=True):
         """
@@ -216,9 +222,7 @@ class SubgoalAutomaton:
         to a next state holds, then the next state will be the current state.
         """
         candidate_states = set()
-        rej_cond = None
-        if self.reject_state is not None:
-            rej_cond = self.edges[self.reject_state][0][0].condition[0]
+        rej_cond = self.get_rej_cond()
         for condition, candidate_state in self.edges[current_state]:
             if condition.is_satisfied(observations, predicates, observables, rej_cond):
                 candidate_states.add(candidate_state)

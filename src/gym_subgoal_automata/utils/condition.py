@@ -49,6 +49,11 @@ class EdgeCondition(Condition):
     #     condition_set, condition_p_set = set(self.condition), set(condition_p.condition)
     #     return len(condition_set.intersection(condition_p_set))
 
+    def get_num_matching_literals(self, condition_p):
+        condition_set, condition_p_set = set(self.condition[0].split('; ')), set(condition_p.condition[0].split('; '))
+        return len(condition_set.intersection(condition_p_set))
+    
+
     # def get_num_positive_matching_symbols(self, condition_p):
     #     pos_conditions , pos_conditions_p = set(self.get_positive_conditions()), set(condition_p.get_positive_conditions())
     #     return len(pos_conditions.intersection(pos_conditions_p))

@@ -8,6 +8,7 @@ from utils import utils
 from ilasp.generator.ilasp_task_generator import generate_ilasp_task
 from ilasp.parser import ilasp_solution_parser
 from ilasp.solver.ilasp_solver import solve_ilasp_task
+from ilasp.generator.utils.ilasp_task_generator_example import get_max_single_step_observations
 
 
 class ISAAlgorithmBase(LearningAlgorithm):
@@ -72,7 +73,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
         self.ilasp_version = utils.get_param(params, ISAAlgorithmBase.ILASP_VERSION_FIELD, "2")
         self.ilasp_compute_minimal = utils.get_param(params, ISAAlgorithmBase.ILASP_COMPUTE_MINIMAL, False)
         self.num_starting_states = utils.get_param(params, ISAAlgorithmBase.STARTING_NUM_STATES_FIELD, 3)
-        self.num_automaton_states = self.num_starting_states * np.ones(self.num_domains, dtype=np.int)
+        self.num_automaton_states = self.num_starting_states * np.ones(self.num_domains, dtype=int)
         self.use_restricted_observables = utils.get_param(params, ISAAlgorithmBase.USE_RESTRICTED_OBSERVABLES, False)
         self.max_disjunction_size = utils.get_param(params, ISAAlgorithmBase.MAX_DISJUNCTION_SIZE, 1)
         self.max_body_literals = utils.get_param(params, ISAAlgorithmBase.MAX_BODY_LITERALS, 1)
@@ -81,7 +82,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
         self.avoid_learning_only_negative = utils.get_param(params, ISAAlgorithmBase.AVOID_LEARNING_ONLY_NEGATIVE, False)
         self.prioritize_optimal_solutions = utils.get_param(params, ISAAlgorithmBase.PRIORITIZE_OPTIMAL_SOLUTIONS, False)
         self.wait_for_goal_example = utils.get_param(params, ISAAlgorithmBase.WAIT_FOR_GOAL_EXAMPLE, True)
-        self.has_observed_goal_example = np.zeros(self.num_domains, dtype=np.bool)
+        self.has_observed_goal_example = np.zeros(self.num_domains, dtype=bool)
 
         # maximum episode annealing parameters
         self.use_max_episode_length_annealing = utils.get_param(params, ISAAlgorithmBase.USE_MAX_EPISODE_LENGTH_ANNEALING, False)
@@ -114,7 +115,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
         self._reset_examples()
 
         # keep track of the number of learnt automata per domain
-        self.automaton_counters = np.zeros(self.num_domains, dtype=np.int)
+        self.automaton_counters = np.zeros(self.num_domains, dtype=int)
         self.automaton_learning_episodes = [[] for _ in range(self.num_domains)]
 
         if self.train_model:  # if the tasks are learnt, remove previous folders if they exist
@@ -144,7 +145,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
         self._update_histories(observation_history, compressed_observation_history, initial_observations)
 
         # get actual initial automaton state (performs verification that there is only one possible initial state!)
-        current_automaton_state = self._get_initial_automaton_state_successors(domain_id, initial_observations)
+        current_automaton_state = self._get_initial_automaton_state_successors(domain_id, initial_observations, task.get_predicates(), task.get_typed_observables())
 
         # update the automaton if the initial state achieves the goal and the example is not covered
         if self.interleaved_automaton_learning and self._can_learn_new_automaton(domain_id, task):
@@ -153,7 +154,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
                                                                              observation_history,
                                                                              compressed_observation_history)
             if updated_automaton:  # get the actual initial state as done before
-                current_automaton_state = self._get_initial_automaton_state_successors(domain_id, initial_observations)
+                current_automaton_state = self._get_initial_automaton_state_successors(domain_id, initial_observations, task.get_predicates(), task.get_typed_observables())
 
         # whether the episode execution must be stopped (an automaton is learnt in the middle)
         interrupt_episode = False
@@ -169,10 +170,10 @@ class ISAAlgorithmBase(LearningAlgorithm):
             observations_changed = self._update_histories(observation_history, compressed_observation_history, observations)
 
             if self.train_model:
-                self._update_q_functions(task_id, current_state, action, next_state, is_terminal, observations, observations_changed)
+                self._update_q_functions(task_id, current_state, action, next_state, is_terminal, observations, observations_changed, automaton.get_rej_cond())
 
             next_automaton_state = self._get_next_automaton_state(self.automata[domain_id], current_automaton_state,
-                                                                  observations, observations_changed)
+                                                                  observations, observations_changed, task.get_predicates(), task.get_typed_observables())
 
             # episode has to be interrupted if an automaton is learnt
             if not interrupt_episode and self.interleaved_automaton_learning and self._can_learn_new_automaton(domain_id, task):
@@ -219,7 +220,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
         pass
 
     @abstractmethod
-    def _update_q_functions(self, task_id, current_state, action, next_state, is_terminal, observations, observations_changed):
+    def _update_q_functions(self, task_id, current_state, action, next_state, is_terminal, observations, observations_changed, rej_cond):
         pass
 
     @abstractmethod
@@ -259,16 +260,16 @@ class ISAAlgorithmBase(LearningAlgorithm):
     def _get_automaton(self, domain_id):
         return self.automata[domain_id]
 
-    def _get_next_automaton_state(self, automaton, current_automaton_state, observations, observations_changed):
+    def _get_next_automaton_state(self, automaton, current_automaton_state, observations, observations_changed, predicates, observables):
         # automaton has to be navigated with compressed traces if specified (just when a change occurs)
         if (self.ignore_empty_observations and len(observations) == 0) or (self.use_compressed_traces and not observations_changed):
             return current_automaton_state
-        return automaton.get_next_state(current_automaton_state, observations)
+        return automaton.get_next_state(current_automaton_state, observations, predicates, observables)
 
-    def _get_initial_automaton_state_successors(self, domain_id, observations):
+    def _get_initial_automaton_state_successors(self, domain_id, observations, predicates, observables):
         automaton = self._get_automaton(domain_id)
         initial_state = automaton.get_initial_state()
-        return self._get_next_automaton_state(automaton, initial_state, observations, True)
+        return self._get_next_automaton_state(automaton, initial_state, observations, True, predicates, observables)
 
     def _set_automata(self, target_automata):
         if self.initial_automaton_mode == "basic":
@@ -385,58 +386,65 @@ class ISAAlgorithmBase(LearningAlgorithm):
     def _update_automaton(self, task, domain_id):
         self.automaton_counters[domain_id] += 1  # increment the counter of the number of aut. learnt for a domain
 
-        self._generate_ilasp_task(task, domain_id)  # generate the automata learning task
+        upper_num_obs = get_max_single_step_observations(self.goal_examples[domain_id], self.dend_examples[domain_id], self.inc_examples[domain_id])
+        
+        if self.debug:
+            print("Current Automaton Limit is: #state:[%i,), #var:[%i,%i)"%
+                  (self.num_automaton_states[domain_id], 2, upper_num_obs+2))
 
-        solver_success = self._solve_ilasp_task(domain_id)  # run the task solver
-        if solver_success:
-            ilasp_solution_filename = os.path.join(self.get_automaton_solution_folder(domain_id),
+        while True:
+            for current_num_var in range(2,upper_num_obs+2):
+                for current_body_len in range(2*(current_num_var-1)+1,4*(current_num_var-1)+2):
+                    for learn_explicit in [False, True]:
+                        self._generate_ilasp_task(task, domain_id,current_num_var,learn_explicit)  # generate the automata learning task
+                        solver_success = self._solve_ilasp_task(domain_id,current_body_len)  # run the task solver
+                        if solver_success:
+                            ilasp_solution_filename = os.path.join(self.get_automaton_solution_folder(domain_id),
                                                    ISAAlgorithmBase.AUTOMATON_SOLUTION_FILENAME % self.automaton_counters[domain_id])
-            candidate_automaton = self._parse_ilasp_solutions(ilasp_solution_filename)
+                            candidate_automaton = self._parse_ilasp_solutions(ilasp_solution_filename)
+                            if candidate_automaton.get_num_states() > 0:
+                                # set initial, accepting and rejecting states in the automaton
+                                candidate_automaton.set_initial_state(ISAAlgorithmBase.INITIAL_STATE_NAME)
+                                candidate_automaton.set_accept_state(ISAAlgorithmBase.ACCEPTING_STATE_NAME)
+                                candidate_automaton.set_reject_state(ISAAlgorithmBase.REJECTING_STATE_NAME)
+                                self.automata[domain_id] = candidate_automaton
 
-            if candidate_automaton.get_num_states() > 0:
-                # set initial, accepting and rejecting states in the automaton
-                candidate_automaton.set_initial_state(ISAAlgorithmBase.INITIAL_STATE_NAME)
-                candidate_automaton.set_accept_state(ISAAlgorithmBase.ACCEPTING_STATE_NAME)
-                candidate_automaton.set_reject_state(ISAAlgorithmBase.REJECTING_STATE_NAME)
-                self.automata[domain_id] = candidate_automaton
+                                # plot the new automaton
+                                candidate_automaton.plot(self.get_automaton_plot_folder(domain_id),
+                                                         ISAAlgorithmBase.AUTOMATON_PLOT_FILENAME % self.automaton_counters[domain_id])
+                                self._on_automaton_learned(domain_id)
+                                return
+                            else:
+                                # if the task is UNSATISFIABLE, it means current combination is not enough to cover the examples
+                                if self.debug:
+                                    print("The current setting has been increased to #state:%i, #var:%i, #body_lit:%i, #body_lit:%s" 
+                                          % (self.num_automaton_states[domain_id], current_num_var, current_body_len, learn_explicit))
+                                    print("Updating automaton...")
+                                continue
+                        else:
+                            raise RuntimeError("Error: Couldn't find an automaton under the specified timeout!")
+            self.num_automaton_states[domain_id] += 1    
 
-                # plot the new automaton
-                candidate_automaton.plot(self.get_automaton_plot_folder(domain_id),
-                                         ISAAlgorithmBase.AUTOMATON_PLOT_FILENAME % self.automaton_counters[domain_id])
 
-                self._on_automaton_learned(domain_id)
-            else:
-                # if the task is UNSATISFIABLE, it means the number of states is not enough to cover the examples, so
-                # the number of states is incremented by 1 and try again
-                self.num_automaton_states[domain_id] += 1
-
-                if self.debug:
-                    print("The number of states in the automaton has been increased to " + str(self.num_automaton_states[domain_id]))
-                    print("Updating automaton...")
-
-                self._update_automaton(task, domain_id)
-        else:
-            raise RuntimeError("Error: Couldn't find an automaton under the specified timeout!")
-
-    def _generate_ilasp_task(self, task, domain_id):
+    def _generate_ilasp_task(self, task, domain_id, num_variables, learn_explicit):
         utils.mkdir(self.get_automaton_task_folder(domain_id))
 
         ilasp_task_filename = ISAAlgorithmBase.AUTOMATON_TASK_FILENAME % self.automaton_counters[domain_id]
 
-        observables = task.get_observables()
-        if self.use_restricted_observables:
-            observables = task.get_restricted_observables()
+        observables = task.get_typed_observables()
+        predicates = task.get_predicates()
 
         # the sets of examples are sorted to make sure that ILASP produces the same solution for the same sets (ILASP
         # can produce different hypothesis for the same set of examples but given in different order)
-        generate_ilasp_task(self.num_automaton_states[domain_id], ISAAlgorithmBase.ACCEPTING_STATE_NAME,
-                            ISAAlgorithmBase.REJECTING_STATE_NAME, observables, sorted(self.goal_examples[domain_id]),
-                            sorted(self.dend_examples[domain_id]), sorted(self.inc_examples[domain_id]),
-                            self.get_automaton_task_folder(domain_id), ilasp_task_filename, self.symmetry_breaking_method,
-                            self.max_disjunction_size, self.learn_acyclic_graph, self.use_compressed_traces,
-                            self.avoid_learning_only_negative, self.prioritize_optimal_solutions, self.binary_folder_name)
+        generate_ilasp_task(self.num_automaton_states[domain_id], 
+                            ISAAlgorithmBase.ACCEPTING_STATE_NAME, ISAAlgorithmBase.REJECTING_STATE_NAME, 
+                            predicates, observables, 
+                            sorted(self.goal_examples[domain_id]), sorted(self.dend_examples[domain_id]), sorted(self.inc_examples[domain_id]),
+                            num_variables, learn_explicit,
+                            self.get_automaton_task_folder(domain_id), ilasp_task_filename)
 
-    def _solve_ilasp_task(self, domain_id):
+
+    def _solve_ilasp_task(self, domain_id, current_body_literals):
         utils.mkdir(self.get_automaton_solution_folder(domain_id))
 
         ilasp_task_filename = os.path.join(self.get_automaton_task_folder(domain_id),
@@ -445,9 +453,10 @@ class ISAAlgorithmBase(LearningAlgorithm):
         ilasp_solution_filename = os.path.join(self.get_automaton_solution_folder(domain_id),
                                                ISAAlgorithmBase.AUTOMATON_SOLUTION_FILENAME % self.automaton_counters[domain_id])
 
-        return solve_ilasp_task(ilasp_task_filename, ilasp_solution_filename, timeout=self.ilasp_timeout,
-                                version=self.ilasp_version, max_body_literals=self.max_body_literals,
-                                binary_folder_name=self.binary_folder_name, compute_minimal=self.ilasp_compute_minimal)
+        return solve_ilasp_task(ilasp_task_filename, ilasp_solution_filename,
+                                max_body_literals=current_body_literals,
+                                timeout=self.ilasp_timeout, version=self.ilasp_version,
+                                binary_folder_name=self.binary_folder_name)
 
     def _parse_ilasp_solutions(self, last_automaton_filename):
         return ilasp_solution_parser.parse_ilasp_solutions(last_automaton_filename)

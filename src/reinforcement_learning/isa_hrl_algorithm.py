@@ -163,12 +163,8 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
         max_num_matchings = 1
         max_conditions, max_conditions_updates = [], []
 
-        # take the existing conditions in the policy bank with highest number of symbol matchings
         for existing_condition in self.policy_bank[task_id]:
-            if self.use_num_positive_matchings:
-                num_matchings = condition.get_num_positive_matching_symbols(existing_condition)
-            else:
-                num_matchings = condition.get_num_matching_symbols(existing_condition)
+            num_matchings = condition.get_num_matching_literals(existing_condition)
             if num_matchings > max_num_matchings:
                 max_num_matchings = num_matchings
                 max_conditions = [existing_condition]
@@ -477,7 +473,7 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
     def _get_state_and_automaton_state_vector(self, state, automaton, automaton_state):
         return np.concatenate((state, self._get_one_hot_automaton_state(automaton, automaton_state)))
 
-    def _update_q_functions(self, task_id, current_state, action, next_state, is_terminal, observations, _):
+    def _update_q_functions(self, task_id, current_state, action, next_state, is_terminal, observations, _, rej_cond):
         task = self._get_task(0, task_id)
 
         if self.use_experience_replay:
@@ -490,13 +486,13 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
                 if self.is_tabular_case:
                     for exp in experience_batch:
                         self._update_tabular_q_functions(task_id, (exp.state, exp.action), exp.next_state,
-                                                         exp.is_terminal, exp.is_goal_achieved, exp.observations)
+                                                         exp.is_terminal, exp.is_goal_achieved, exp.observations, rej_cond)
                 else:
-                    self._update_deep_q_functions(task_id, experience_batch)
+                    self._update_deep_q_functions(task_id, experience_batch, rej_cond)
         else:
             # update all q-tables of the current task (not other tasks because state spaces might be different!)
             current_pair = (current_state, action)
-            self._update_tabular_q_functions(task_id, current_pair, next_state, is_terminal, task.is_goal_achieved(), observations)
+            self._update_tabular_q_functions(task_id, current_pair, next_state, is_terminal, task.is_goal_achieved(), observations, rej_cond)
 
     def _get_experience_replay_buffer(self, task_id):
         return self.experience_replay_buffers[task_id]
@@ -507,7 +503,7 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
             all_conditions.update(self.automata[domain_id].get_all_conditions())
         return sorted(all_conditions)
 
-    def _update_tabular_q_functions(self, task_id, current_pair, next_state, is_terminal, is_goal_achieved, observations):
+    def _update_tabular_q_functions(self, task_id, current_pair, next_state, is_terminal, is_goal_achieved, observations, rej_cond):
         # take any task, just needed for the number of actions
         task = self._get_task(0, task_id)
 
@@ -517,7 +513,7 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
             conditions = self._get_all_automata_conditions()
 
         for condition in conditions:
-            reward, is_terminal_local = self._get_pseudoreward_for_condition(condition, observations, is_terminal, is_goal_achieved)
+            reward, is_terminal_local = self._get_pseudoreward_for_condition(condition, observations, is_terminal, is_goal_achieved, task.get_predicates(), task.get_typed_observables(), rej_cond)
             if is_terminal_local:
                 delta = reward
             else:
@@ -528,11 +524,11 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
             self.policy_bank[task_id][condition][current_pair] += self.learning_rate * (delta - self.policy_bank[task_id][condition][current_pair])
             self.policy_bank_update_counter[task_id][condition] += 1
 
-    def _get_pseudoreward_for_condition(self, condition, observations, is_terminal, is_goal_achieved):
+    def _get_pseudoreward_for_condition(self, condition, observations, is_terminal, is_goal_achieved, predicates, observables, rej_cond):
         """Returns the pseudoreward used to update the policy that aims to achieve the condition passes as a parameter."""
         valid_observation = not self.ignore_empty_observations or len(observations) > 0
 
-        if condition.is_satisfied(observations) and valid_observation:
+        if condition.is_satisfied(observations, predicates, observables, rej_cond) and valid_observation:
             return self.pseudoreward_condition_satisfied, True
         elif is_terminal:
             if not is_goal_achieved and self.enable_pseudoreward_on_deadend_state:
@@ -541,7 +537,7 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
             return 0.0, True
         return self.pseudoreward_after_step, False
 
-    def _update_deep_q_functions(self, task_id, experience_batch):
+    def _update_deep_q_functions(self, task_id, experience_batch, rej_cond):
         states, actions, next_states, is_terminal, is_goal_achieved, observations = zip(*experience_batch)
 
         states_v = torch.tensor(states).to(self.device)
@@ -555,7 +551,7 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
 
         for condition in conditions:
             rewards, is_terminal_local = self._get_transition_rewards_terminal_batches(condition, observations,
-                                                                                       is_terminal, is_goal_achieved)
+                                                                                       is_terminal, is_goal_achieved, rej_cond)
             rewards_v = torch.tensor(rewards, dtype=torch.float32).to(self.device)
             is_terminal_v = torch.tensor(is_terminal_local, dtype=torch.bool).to(self.device)
 
@@ -581,12 +577,12 @@ class ISAAlgorithmHRL(ISAAlgorithmBase):
             self.policy_bank_optimizers[task_id][condition].step()
             self.policy_bank_update_counter[task_id][condition] += 1
 
-    def _get_transition_rewards_terminal_batches(self, condition, observations, is_terminal, is_goal_achieved):
+    def _get_transition_rewards_terminal_batches(self, condition, observations, is_terminal, is_goal_achieved, predicates, observables, rej_cond):
         transition_rewards_batch = []
         transition_terminal_batch = []
         for i in range(len(observations)):
             reward, is_terminal_local = self._get_pseudoreward_for_condition(condition, observations[i], is_terminal[i],
-                                                                             is_goal_achieved[i])
+                                                                             is_goal_achieved[i], predicates, observables, rej_cond)
             transition_rewards_batch.append(reward)
             transition_terminal_batch.append(is_terminal_local)
         return transition_rewards_batch, transition_terminal_batch

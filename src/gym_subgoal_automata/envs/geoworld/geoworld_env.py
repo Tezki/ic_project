@@ -135,8 +135,8 @@ class GeoWorldEnv(GridWorldEnv, ABC):
     def _update_state(self):
         if self.prev_agent != self.agent:
             self.automaton_state = self.automaton.get_next_state(self.automaton_state, self.get_observations(), self.get_predicates(), self.get_typed_observables())
-            print(self.automaton_state)
-            print(self.get_observations())
+            #print(self.automaton_state)
+            #print(self.get_observations())
 
     def _load_map(self):
         random_gen = random.Random(self.seed)
@@ -207,7 +207,7 @@ class GeoWorldLandmarkIsNotBuildingEnv(GeoWorldEnv):
         automaton.add_state("u_acc")
         automaton.add_state("u_rej")
 
-        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); not bld(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
         automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
         automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
 
@@ -216,7 +216,7 @@ class GeoWorldLandmarkIsNotBuildingEnv(GeoWorldEnv):
         automaton.set_reject_state("u_rej")
         return automaton
 
-class GeoWorldLandmarkWithRestrictions(GeoWorldEnv):
+class GeoWorldLandmarkWithRestrictionsEnv(GeoWorldEnv):
     """
     Observe a landmark that is not a museum while avoiding an obstacle that is not a mountain.
     """
@@ -239,7 +239,7 @@ class GeoWorldLandmarkWithRestrictions(GeoWorldEnv):
         automaton.set_reject_state("u_rej")
         return automaton
 
-class GeoWorldLandmarkSequenceWithRestrictions(GeoWorldEnv):
+class GeoWorldLandmarkSequenceWithRestrictionsEnv(GeoWorldEnv):
     """
     Observe, in sequence, a landmark that is a building and a landmark that is not a building while avoiding an obstacle.
     """

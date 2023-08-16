@@ -139,7 +139,7 @@ class ISAAlgorithmQRM(ISAAlgorithmBase):
             return -1
         return 0
 
-    def _update_q_functions(self, task_id, current_state, action, next_state, is_terminal, observations, observations_changed):
+    def _update_q_functions(self, task_id, current_state, action, next_state, is_terminal, observations, observations_changed, rej_cond):
         if self.use_experience_replay:
             experience = Experience(current_state, action, next_state, is_terminal, observations, observations_changed)
             experience_replay_buffer = self._get_experience_replay_buffer(task_id)
