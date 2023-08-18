@@ -35,7 +35,7 @@ class EdgeCondition(Condition):
         return tuple(sorted(self.condition))
 
     def __str__(self):
-        return "&".join(self.condition)
+        return "\n".join(self.condition)
 
     # def is_subsumed(self, condition_p):
     #     condition_set, condition_p_set = set(self.condition), set(condition_p)

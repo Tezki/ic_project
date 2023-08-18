@@ -14,3 +14,9 @@ register(
     id='GeoWorldLandmarkSequenceWithRestrictionsEnv-v0',
     entry_point='gym_subgoal_automata.envs.geoworld:GeoWorldLandmarkSequenceWithRestrictionsEnv',
 )
+
+register(
+    id='GeoWorldLandmarkOrBuildingSequenceEnv-v0',
+    entry_point='gym_subgoal_automata.envs.geoworld:GeoWorldLandmarkOrBuildingSequenceEnv',
+)
+
