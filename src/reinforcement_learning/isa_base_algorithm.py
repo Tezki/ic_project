@@ -459,7 +459,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
                                 binary_folder_name=self.binary_folder_name)
 
     def _parse_ilasp_solutions(self, last_automaton_filename):
-        return ilasp_solution_parser.parse_ilasp_solutions(last_automaton_filename)
+        return ilasp_solution_parser.parse_ilasp_solutions(last_automaton_filename, self.REJECTING_STATE_NAME)
 
     '''
     Logging and Messaging Management Methods

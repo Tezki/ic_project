@@ -291,7 +291,7 @@ class GeoWorldLandmarkSequenceWithRestrictionsEnv(GeoWorldEnv):
         automaton.set_reject_state("u_rej")
         return automaton
 
-class GeoWorldLandmarkOrBuildingSeqEnv(GeoWorldEnv):
+class GeoWorldLandmarkOrBuildingSequenceEnv(GeoWorldEnv):
     """
     Observe, in sequence, either two landmarks or two buildings while avoiding an obstacle.
     """
