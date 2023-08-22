@@ -291,7 +291,7 @@ class GeoWorldLandmarkSequenceWithRestrictionsEnv(GeoWorldEnv):
         automaton.set_reject_state("u_rej")
         return automaton
 
-class GeoWorldLandmarkOrBuildingSeqEnv(GeoWorldEnv):
+class GeoWorldLandmarkOrBuildingSequenceEnv(GeoWorldEnv):
     """
     Observe, in sequence, either two landmarks or two buildings while avoiding an obstacle.
     """
@@ -304,23 +304,18 @@ class GeoWorldLandmarkOrBuildingSeqEnv(GeoWorldEnv):
         automaton.add_state("u0")
         automaton.add_state("u1")
         automaton.add_state("u2")
-        automaton.add_state("u3")
         automaton.add_state("u_acc")
         automaton.add_state("u_rej")
 
-        automaton.add_edge("u0", "u1", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u2", "u3", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u0", "u2", ["obs(V2,V1); bld(V2); not lmk(V2); not rej_cond(V1)"])
-        automaton.add_edge("u1", "u3", ["obs(V2,V1); bld(V2); not lmk(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u1", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
         automaton.add_edge("u1", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
-        automaton.add_edge("u3", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
+
+        automaton.add_edge("u0", "u2", ["obs(V2,V1); not lmk(V2); not rej_cond(V1)"])
         automaton.add_edge("u2", "u_acc", ["obs(V2,V1); bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u3", "u_acc", ["obs(V2,V1); bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u0", "u3", ["obs(V2,V1); lmk(V2); bld(V2); not rej_cond(V1)"])
+        
         automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
         automaton.add_edge("u1", "u_rej", ["obs(V2,V1); obt(V2)"])
         automaton.add_edge("u2", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u3", "u_rej", ["obs(V2,V1); obt(V2)"])
         automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
 
         automaton.set_initial_state("u0")

@@ -395,7 +395,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
         while True:
             for current_num_var in range(2,upper_num_obs+2):
                 for current_body_len in range(2*(current_num_var-1)+1,4*(current_num_var-1)+2):
-                    for learn_explicit in [False, True]:
+                    for learn_explicit in [False, True]:    
                         self._generate_ilasp_task(task, domain_id,current_num_var,learn_explicit)  # generate the automata learning task
                         solver_success = self._solve_ilasp_task(domain_id,current_body_len)  # run the task solver
                         if solver_success:
@@ -459,7 +459,7 @@ class ISAAlgorithmBase(LearningAlgorithm):
                                 binary_folder_name=self.binary_folder_name)
 
     def _parse_ilasp_solutions(self, last_automaton_filename):
-        return ilasp_solution_parser.parse_ilasp_solutions(last_automaton_filename)
+        return ilasp_solution_parser.parse_ilasp_solutions(last_automaton_filename, self.REJECTING_STATE_NAME)
 
     '''
     Logging and Messaging Management Methods
