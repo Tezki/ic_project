@@ -42,11 +42,11 @@ class GeoWorldEnv(GridWorldEnv, ABC):
         self.locations = {}     # locations of the objects
 
         # grid size
-        self.height = utils.get_param(params, GeoWorldEnv.GRID_HEIGHT, 39)
-        self.width = utils.get_param(params, GeoWorldEnv.GRID_WIDTH, 39)
+        self.height = utils.get_param(params, GeoWorldEnv.GRID_HEIGHT, 10)
+        self.width = utils.get_param(params, GeoWorldEnv.GRID_WIDTH, 10)
         self.observation_space = spaces.Discrete(self._get_num_states())
 
-        self.enforce_single_observable_per_location = utils.get_param(params, GeoWorldEnv.ENFORCE_SINGLE_OBSERVARBLE_PER_LOCATION, True)
+        self.enforce_single_observable_per_location = utils.get_param(params, GeoWorldEnv.ENFORCE_SINGLE_OBSERVARBLE_PER_LOCATION, False)
 
         # the completion of the task is checked against the ground truth automaton
         self.automaton = self.get_automaton()
@@ -141,7 +141,6 @@ class GeoWorldEnv(GridWorldEnv, ABC):
     def _load_map(self):
         random_gen = random.Random(self.seed)
 
-        self.init_agent = self._generate_random_pos(random_gen)
         self._add_location(GeoWorldObject.MUSEUM, 2, random_gen)
         self._add_location(GeoWorldObject.WATERFALL, 3, random_gen)
         self._add_location(GeoWorldObject.CAVE, 3, random_gen)
@@ -151,6 +150,10 @@ class GeoWorldEnv(GridWorldEnv, ABC):
         self._add_location(GeoWorldObject.MALL, 4, random_gen)
         self._add_location(GeoWorldObject.SCHOOL, 3, random_gen)
         self._add_location(GeoWorldObject.CHURCH, 3, random_gen)
+
+        self.init_agent = self._generate_random_pos(random_gen)
+        while self.init_agent in self.locations:
+            self.init_agent = self._generate_random_pos(random_gen)
 
     def _add_location(self, symbol, number, random_gen):
         for _ in range(number):
@@ -192,10 +195,13 @@ class GeoWorldEnv(GridWorldEnv, ABC):
         print()
 
 
-class GeoWorldLandmarkIsNotBuildingEnv(GeoWorldEnv):
-    """
-    Observe a landmark that is not a building while avoiding an obstacle.
-    In this case the only avaliable choice is to see a museum ("ms").
+
+# Env
+
+class GeoWorldLandmarkEnv(GeoWorldEnv):
+    """ 
+    Task 1
+    Observe a landmark while avoiding an obstacle.
     """
 
     def get_restricted_observables(self):# not using this function
@@ -207,7 +213,7 @@ class GeoWorldLandmarkIsNotBuildingEnv(GeoWorldEnv):
         automaton.add_state("u_acc")
         automaton.add_state("u_rej")
 
-        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
         automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
         automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
 
@@ -218,6 +224,7 @@ class GeoWorldLandmarkIsNotBuildingEnv(GeoWorldEnv):
 
 class GeoWorldLandmarkWithRestrictionsEnv(GeoWorldEnv):
     """
+    Task 2
     Observe a landmark that is not a museum while avoiding an obstacle that is not a mountain.
     """
 
@@ -239,8 +246,206 @@ class GeoWorldLandmarkWithRestrictionsEnv(GeoWorldEnv):
         automaton.set_reject_state("u_rej")
         return automaton
 
+class GeoWorldObstacleWithRestrictionEnv(GeoWorldEnv):
+    """
+    Task 3
+    Observe a landmark while avoiding an obstacle that is not the said landmark.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2); not lmk(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2); not lmk(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldLandmarkOrBuildingEnv(GeoWorldEnv):
+    """
+    Task 4
+    Observe a landmark or a building while avoiding an obstacle.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)",
+                                            "obs(V2,V1); bld(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldLandmarkAndBuildingEnv(GeoWorldEnv):
+    """
+    Task 5
+    Observe a landmark and a building simultaneously while avoiding an obstacle.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); obs(V3,V1); bld(V3); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldLandmarkIsBuildingEnv(GeoWorldEnv):
+    """
+    Task 6
+    Observe a landmark that is a building while avoiding an obstacle.
+    In this case the only avaliable choice is to see a museum ("ms").
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); bld(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldLandmarkIsNotBuildingEnv(GeoWorldEnv):
+    """
+    Task 7
+    Observe a landmark that is not a building while avoiding an obstacle.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldObstacleIsBuildingEnv(GeoWorldEnv):
+    """
+    Task 8
+    Observe a landmark while avoiding an obstacle that is a building.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); bld(V2); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); bld(V2); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldObstacleIsNotBuildingEnv(GeoWorldEnv):
+    """
+    Task 9
+    Observe a landmark while avoiding an obstacle that is not a building.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); not bld(V2); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); not bld(V2); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
+class GeoWorldLandmarkBuildingSequenceEnv(GeoWorldEnv):
+    """
+    Task 10
+    Observe, in sequence, a landmark and a building while avoiding an obstacle.
+    """
+
+    def get_restricted_observables(self):# not using this function
+        return []
+
+    def get_automaton(self):
+        automaton = SubgoalAutomaton()
+        automaton.add_state("u0")
+        automaton.add_state("u1")
+        automaton.add_state("u_acc")
+        automaton.add_state("u_rej")
+
+        automaton.add_edge("u0", "u1", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
+        automaton.add_edge("u1", "u_acc", ["obs(V2,V1); bld(V2); not rej_cond(V1)"])
+        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
+        automaton.add_edge("u1", "u_rej", ["obs(V2,V1); obt(V2)"])
+        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
+
+        automaton.set_initial_state("u0")
+        automaton.set_accept_state("u_acc")
+        automaton.set_reject_state("u_rej")
+        return automaton
+
 class GeoWorldLandmarkSequenceWithRestrictionsEnv(GeoWorldEnv):
     """
+    Task 11
     Observe, in sequence, a landmark that is a building and a landmark that is not a building while avoiding an obstacle.
     """
 
@@ -265,71 +470,7 @@ class GeoWorldLandmarkSequenceWithRestrictionsEnv(GeoWorldEnv):
         automaton.set_reject_state("u_rej")
         return automaton
 
-class GeoWorldLandmarkSequenceWithRestrictionsEnv(GeoWorldEnv):
-    """
-    Observe, in sequence, a landmark that is a building and a landmark that is not a building while avoiding an obstacle.
-    """
-
-    def get_restricted_observables(self):# not using this function
-        return []
-
-    def get_automaton(self):
-        automaton = SubgoalAutomaton()
-        automaton.add_state("u0")
-        automaton.add_state("u1")
-        automaton.add_state("u_acc")
-        automaton.add_state("u_rej")
-
-        automaton.add_edge("u0", "u1", ["obs(V2,V1); lmk(V2); bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u1", "u_acc", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u1", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
-
-        automaton.set_initial_state("u0")
-        automaton.set_accept_state("u_acc")
-        automaton.set_reject_state("u_rej")
-        return automaton
-
-class GeoWorldLandmarkOrBuildingSequenceEnv(GeoWorldEnv):
-    """
-    Observe, in sequence, either two landmarks or two buildings while avoiding an obstacle.
-    """
-
-    def get_restricted_observables(self):# not using this function
-        return []
-
-    def get_automaton(self):
-        automaton = SubgoalAutomaton()
-        automaton.add_state("u0")
-        automaton.add_state("u1")
-        automaton.add_state("u2")
-        automaton.add_state("u3")
-        automaton.add_state("u_acc")
-        automaton.add_state("u_rej")
-
-        automaton.add_edge("u0", "u1", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u2", "u3", ["obs(V2,V1); lmk(V2); not bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u0", "u2", ["obs(V2,V1); bld(V2); not lmk(V2); not rej_cond(V1)"])
-        automaton.add_edge("u1", "u3", ["obs(V2,V1); bld(V2); not lmk(V2); not rej_cond(V1)"])
-        automaton.add_edge("u1", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
-        automaton.add_edge("u3", "u_acc", ["obs(V2,V1); lmk(V2); not rej_cond(V1)"])
-        automaton.add_edge("u2", "u_acc", ["obs(V2,V1); bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u3", "u_acc", ["obs(V2,V1); bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u0", "u3", ["obs(V2,V1); lmk(V2); bld(V2); not rej_cond(V1)"])
-        automaton.add_edge("u0", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u1", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u2", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u3", "u_rej", ["obs(V2,V1); obt(V2)"])
-        automaton.add_edge("u_rej", "u_rej", ["obs(V2,V1); obt(V2)"])
-
-        automaton.set_initial_state("u0")
-        automaton.set_accept_state("u_acc")
-        automaton.set_reject_state("u_rej")
-        return automaton
-
-
-class TestEnv(GeoWorldEnv):
+class GeoWorldTestEnv(GeoWorldEnv):
     """
     Observe, in sequence, a landmark that is a building and a landmark that is not a building while avoiding an obstacle.
     """

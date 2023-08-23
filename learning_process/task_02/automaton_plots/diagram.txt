@@ -1,0 +1,9 @@
+digraph G {
+u0 [label="u0"];
+u_acc [label="u_acc"];
+u_rej [label="u_rej"];
+u0 -> u_acc [label="obs(V2,V1); eq(V2,cv); not rej_cond(V1)
+obs(V2,V1); eq(V2,pk); not rej_cond(V1)"];
+u0 -> u_rej [label="obs(V2,V1); obt(V2); not eq(V2,mt)"];
+u_rej -> u_rej [label="obs(V2,V1); obt(V2); not eq(V2,mt)"];
+}

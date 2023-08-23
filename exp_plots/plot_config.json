@@ -1,9 +1,58 @@
 [
   {
-    "label": "HRL-11",
+    "label": "task_01",
     "folders": [
-      "landmark-sequence-with-restriction"
+      "../learning_process/task_01"
     ],
     "colour": "#FF0000"
+  },
+  {
+    "label": "task_03",
+    "folders": [
+      "../learning_process/task_03"
+    ],
+    "colour": "#FFA500"
+  },
+  {
+    "label": "task_04",
+    "folders": [
+      "../learning_process/task_04"
+    ],
+    "colour": "#FFFF00"
+  },
+  {
+    "label": "task_05",
+    "folders": [
+      "../learning_process/task_05"
+    ],
+    "colour": "#00FF00"
+  },
+  {
+    "label": "task_06",
+    "folders": [
+      "../learning_process/task_06"
+    ],
+    "colour": "#00FFFF"
+  },
+  {
+    "label": "task_07",
+    "folders": [
+      "../learning_process/task_07"
+    ],
+    "colour": "#0000FF"
+  },
+  {
+    "label": "task_08",
+    "folders": [
+      "../learning_process/task_09"
+    ],
+    "colour": "#4B0082"
+  },
+  {
+    "label": "task_09",
+    "folders": [
+      "../learning_process/task_09"
+    ],
+    "colour": "#EE82EE"
   }
 ]

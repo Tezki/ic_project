@@ -1,0 +1,17 @@
+ed(u0,u1).
+ed(u1,u_acc).
+rej_cond(V1) :- obs(V2,V1); eq(V2,ml).
+trans(u0,u1,V1) :- obs(V2,V1); bld(V2); not rej_cond(V1).
+trans(u1,u_acc,V1) :- obs(V2,V1); eq(V2,ch); not rej_cond(V1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Pre-processing                          : 0.054s
+%% Hypothesis Space Generation             : 0.048s
+%% Conflict analysis                       : 28.644s
+%%   - Positive Examples                   : 28.644s
+%% Counterexample search                   : 0.088s
+%%   - CDOEs                               : 0.001s
+%%   - CDPIs                               : 0.081s
+%% Hypothesis Search                       : 2.446s
+%% Total                                   : 31.35s
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
