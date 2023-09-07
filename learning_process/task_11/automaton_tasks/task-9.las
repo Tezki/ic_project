@@ -30,6 +30,16 @@ path(X, Y) :- ed(X, Z), path(Z, Y).
 lmk(ms). lmk(wf). lmk(cv). lmk(pk). 
 obt(ft). obt(wf). obt(mt). obt(ml). 
 bld(ms). bld(sc). bld(ch). bld(ml). 
+eq(V,C) :- lmk(V), lmk(C), V==C.
+eq(V,C) :- lmk(V), obt(C), V==C.
+eq(V,C) :- lmk(V), bld(C), V==C.
+eq(V,C) :- obt(V), lmk(C), V==C.
+eq(V,C) :- obt(V), obt(C), V==C.
+eq(V,C) :- obt(V), bld(C), V==C.
+eq(V,C) :- bld(V), lmk(C), V==C.
+eq(V,C) :- bld(V), obt(C), V==C.
+eq(V,C) :- bld(V), bld(C), V==C.
+
 ed(u0, u_rej).
 trans(u0, u_rej, T) :- rej_cond(T).
 ed(u1, u_rej).
@@ -39,6 +49,18 @@ trans(u1, u_rej, T) :- rej_cond(T).
 #constant(st, u_acc).
 #constant(st, u_rej).
 
+#constant(o, ms).
+#constant(o, wf).
+#constant(o, cv).
+#constant(o, pk).
+#constant(o, ft).
+#constant(o, wf).
+#constant(o, mt).
+#constant(o, ml).
+#constant(o, ms).
+#constant(o, sc).
+#constant(o, ch).
+#constant(o, ml).
 #modeh(ed(const(st),const(st))).
 #modeh(trans(const(st),const(st),var(t))).
 #modeh(rej_cond(var(t))).
@@ -47,6 +69,7 @@ trans(u1, u_rej, T) :- rej_cond(T).
 #modeb(1, lmk(var(v1))).
 #modeb(1, obt(var(v1))).
 #modeb(1, bld(var(v1))).
+#modeb(1, eq(var(v1),const(o))).
 #modeb(1, rej_cond(var(t)),(negative)).
 
 #bias("
@@ -94,6 +117,11 @@ trans(u1, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({}, {accept, reject}, {
+    obs(ch, 0). obs(ch, 1). obs(cv, 2).
+    last(2).
+}).
+
+#pos({}, {accept, reject}, {
     obs(ms, 0).
     last(0).
 }).
@@ -109,17 +137,12 @@ trans(u1, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({}, {accept, reject}, {
+    obs(pk, 0). obs(ch, 1). obs(sc, 2).
+    last(2).
+}).
+
+#pos({}, {accept, reject}, {
     obs(pk, 0). obs(pk, 1).
-    last(1).
-}).
-
-#pos({}, {accept, reject}, {
-    obs(pk, 0). obs(sc, 1).
-    last(1).
-}).
-
-#pos({}, {accept, reject}, {
-    obs(sc, 0). obs(sc, 1).
     last(1).
 }).
 

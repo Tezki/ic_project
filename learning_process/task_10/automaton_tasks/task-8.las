@@ -3,7 +3,7 @@ state(u1).
 state(u_acc).
 state(u_rej).
 
-all_steps(0..9).
+all_steps(0..10).
 step(T) :- all_steps(T), last(U), T<U+1.
 
 st(0, u0).
@@ -84,23 +84,13 @@ trans(u1, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({accept}, {reject}, {
-    obs(sc, 0). obs(cv, 1). obs(cv, 2). obs(cv, 3). obs(ms, 4).
-    last(4).
-}).
-
-#pos({accept}, {reject}, {
-    obs(sc, 0). obs(sc, 1). obs(sc, 2). obs(sc, 3). obs(sc, 4). obs(sc, 5). obs(ch, 6). obs(pk, 7). obs(sc, 8).
-    last(8).
+    obs(pk, 0). obs(pk, 1). obs(pk, 2). obs(pk, 3). obs(pk, 4). obs(pk, 5). obs(pk, 6). obs(pk, 7). obs(pk, 8). obs(ms, 9).
+    last(9).
 }).
 
 #pos({reject}, {accept}, {
     obs(ft, 0).
     last(0).
-}).
-
-#pos({reject}, {accept}, {
-    obs(pk, 0). obs(pk, 1). obs(pk, 2). obs(pk, 3). obs(mt, 4).
-    last(4).
 }).
 
 #pos({}, {accept, reject}, {
@@ -114,7 +104,17 @@ trans(u1, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({}, {accept, reject}, {
-    obs(sc, 0).
+    obs(ms, 0).
     last(0).
+}).
+
+#pos({}, {accept, reject}, {
+    obs(pk, 0). obs(pk, 1).
+    last(1).
+}).
+
+#pos({}, {accept, reject}, {
+    obs(sc, 0). obs(sc, 1).
+    last(1).
 }).
 

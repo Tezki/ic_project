@@ -80,17 +80,17 @@ trans(u0, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({accept}, {reject}, {
-    obs(pk, 0). obs(pk, 1). obs(ch, 2). obs(ms, 2).
-    last(2).
-}).
-
-#pos({reject}, {accept}, {
-    obs(ft, 0). obs(ml, 0).
+    obs(pk, 0). obs(sc, 0).
     last(0).
 }).
 
+#pos({reject}, {accept}, {
+    obs(sc, 0). obs(sc, 1). obs(mt, 2).
+    last(2).
+}).
+
 #pos({}, {accept, reject}, {
-    obs(pk, 0).
+    obs(sc, 0).
     last(0).
 }).
 

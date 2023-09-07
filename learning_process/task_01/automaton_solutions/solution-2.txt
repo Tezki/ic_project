@@ -2,13 +2,13 @@ ed(u0,u_acc).
 trans(u0,u_acc,V1) :- obs(V2,V1); lmk(V2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Pre-processing                          : 0.067s
-%% Hypothesis Space Generation             : 0.016s
-%% Conflict analysis                       : 0.015s
-%%   - Positive Examples                   : 0.015s
-%% Counterexample search                   : 0.01s
-%%   - CDOEs                               : 0.001s
-%%   - CDPIs                               : 0.009s
-%% Hypothesis Search                       : 0.004s
-%% Total                                   : 0.115s
+%% Pre-processing                          : 0.068s
+%% Hypothesis Space Generation             : 0.022s
+%% Conflict analysis                       : 0.025s
+%%   - Positive Examples                   : 0.025s
+%% Counterexample search                   : 0.015s
+%%   - CDOEs                               : 0.002s
+%%   - CDPIs                               : 0.014s
+%% Hypothesis Search                       : 0.005s
+%% Total                                   : 0.139s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

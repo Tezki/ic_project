@@ -84,8 +84,8 @@ trans(u0, u_rej, T) :- rej_cond(T).
     last(0).
 }).
 
-#pos({accept}, {reject}, {
-    obs(pk, 0).
+#pos({reject}, {accept}, {
+    obs(ml, 0).
     last(0).
 }).
 

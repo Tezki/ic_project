@@ -1,0 +1,30 @@
+[
+  {
+    "label": "task_10",
+    "folders": [
+      "../learning_process/task_10"
+    ],
+    "colour": "#00FFFF"
+  },
+  {
+    "label": "task_11",
+    "folders": [
+      "../learning_process/task_11"
+    ],
+    "colour": "#EE82EE"
+  },
+  {
+    "label": "task_06",
+    "folders": [
+      "../learning_process/task_06"
+    ],
+    "colour": "#FF0000"
+  },
+  {
+    "label": "task_05",
+    "folders": [
+      "../learning_process/task_05"
+    ],
+    "colour": "#00FF00"
+  }
+]

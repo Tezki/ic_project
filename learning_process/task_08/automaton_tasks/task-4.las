@@ -2,7 +2,7 @@ state(u0).
 state(u_acc).
 state(u_rej).
 
-all_steps(0..2).
+all_steps(0..6).
 step(T) :- all_steps(T), last(U), T<U+1.
 
 st(0, u0).
@@ -75,12 +75,12 @@ trans(u0, u_rej, T) :- rej_cond(T).
 
 #maxv(2).
 #pos({accept}, {reject}, {
-    obs(ms, 0).
-    last(0).
+    obs(ch, 0). obs(ch, 1). obs(ch, 2). obs(ch, 3). obs(ch, 4). obs(wf, 5).
+    last(5).
 }).
 
-#pos({reject}, {accept}, {
-    obs(ml, 0).
+#pos({accept}, {reject}, {
+    obs(ms, 0).
     last(0).
 }).
 

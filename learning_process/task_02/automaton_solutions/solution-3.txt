@@ -4,12 +4,12 @@ trans(u0,u_acc,V1) :- obs(V2,V1); not bld(V2); not rej_cond(V1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Pre-processing                          : 0.069s
-%% Hypothesis Space Generation             : 0.02s
-%% Conflict analysis                       : 0.052s
-%%   - Positive Examples                   : 0.052s
-%% Counterexample search                   : 0.029s
+%% Hypothesis Space Generation             : 0.021s
+%% Conflict analysis                       : 0.066s
+%%   - Positive Examples                   : 0.066s
+%% Counterexample search                   : 0.032s
 %%   - CDOEs                               : 0.005s
-%%   - CDPIs                               : 0.026s
+%%   - CDPIs                               : 0.028s
 %% Hypothesis Search                       : 0.012s
-%% Total                                   : 0.184s
+%% Total                                   : 0.203s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

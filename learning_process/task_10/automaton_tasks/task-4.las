@@ -108,12 +108,12 @@ trans(u0, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({}, {accept, reject}, {
-    obs(cv, 0).
+    obs(ch, 0).
     last(0).
 }).
 
 #pos({}, {accept, reject}, {
-    obs(sc, 0).
+    obs(cv, 0).
     last(0).
 }).
 

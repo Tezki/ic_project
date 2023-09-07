@@ -106,6 +106,11 @@ trans(u1, u_rej, T) :- rej_cond(T).
     last(2).
 }).
 
+#pos({accept}, {reject}, {
+    obs(ms, 0). obs(ms, 1). obs(ms, 2). obs(cv, 3).
+    last(3).
+}).
+
 #pos({reject}, {accept}, {
     obs(ft, 0).
     last(0).
@@ -122,13 +127,18 @@ trans(u1, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({}, {accept, reject}, {
-    obs(ch, 0). obs(pk, 1).
-    last(1).
+    obs(ch, 0). obs(ch, 1). obs(cv, 2).
+    last(2).
 }).
 
 #pos({}, {accept, reject}, {
     obs(ms, 0).
     last(0).
+}).
+
+#pos({}, {accept, reject}, {
+    obs(ms, 0). obs(ch, 1).
+    last(1).
 }).
 
 #pos({}, {accept, reject}, {
@@ -142,22 +152,12 @@ trans(u1, u_rej, T) :- rej_cond(T).
 }).
 
 #pos({}, {accept, reject}, {
+    obs(pk, 0). obs(ch, 1). obs(sc, 2).
+    last(2).
+}).
+
+#pos({}, {accept, reject}, {
     obs(pk, 0). obs(pk, 1).
-    last(1).
-}).
-
-#pos({}, {accept, reject}, {
-    obs(pk, 0). obs(pk, 1). obs(pk, 2). obs(ch, 3).
-    last(3).
-}).
-
-#pos({}, {accept, reject}, {
-    obs(pk, 0). obs(sc, 1).
-    last(1).
-}).
-
-#pos({}, {accept, reject}, {
-    obs(sc, 0). obs(sc, 1).
     last(1).
 }).
 

@@ -3,13 +3,13 @@ rej_cond(V1) :- obs(V2,V1); eq(V2,ft).
 trans(u0,u_acc,V1) :- obs(V2,V1); eq(V2,ms); not rej_cond(V1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Pre-processing                          : 0.054s
-%% Hypothesis Space Generation             : 0.053s
-%% Conflict analysis                       : 0.274s
-%%   - Positive Examples                   : 0.274s
-%% Counterexample search                   : 0.024s
-%%   - CDOEs                               : 0.002s
-%%   - CDPIs                               : 0.018s
-%% Hypothesis Search                       : 0.038s
-%% Total                                   : 0.448s
+%% Pre-processing                          : 0.065s
+%% Hypothesis Space Generation             : 0.074s
+%% Conflict analysis                       : 0.38s
+%%   - Positive Examples                   : 0.38s
+%% Counterexample search                   : 0.056s
+%%   - CDOEs                               : 0.003s
+%%   - CDPIs                               : 0.053s
+%% Hypothesis Search                       : 0.051s
+%% Total                                   : 0.63s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
