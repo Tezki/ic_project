@@ -2,13 +2,13 @@ ed(u0,u_acc).
 trans(u0,u_acc,V1) :- obs(V2,V1); bld(V2).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Pre-processing                          : 0.075s
-%% Hypothesis Space Generation             : 0.017s
-%% Conflict analysis                       : 0.038s
-%%   - Positive Examples                   : 0.038s
-%% Counterexample search                   : 0.013s
-%%   - CDOEs                               : 0.002s
-%%   - CDPIs                               : 0.013s
+%% Pre-processing                          : 0.062s
+%% Hypothesis Space Generation             : 0.014s
+%% Conflict analysis                       : 0.041s
+%%   - Positive Examples                   : 0.041s
+%% Counterexample search                   : 0.009s
+%%   - CDOEs                               : 0.001s
+%%   - CDPIs                               : 0.008s
 %% Hypothesis Search                       : 0.006s
-%% Total                                   : 0.151s
+%% Total                                   : 0.133s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,18 +1,18 @@
 {
-    "environments": ["task_01"
+    "environments": ["task_06"
                     ], 
     "task_generation_method": "random", 
-    "num_tasks": 20, 
+    "num_tasks": 10, 
     "use_environment_seed": true, 
     "starting_environment_seed": 39, 
-    "folder_names": ["../learning_process/task_01"
+    "folder_names": ["../learning_process/task_06"
                     ],
     "enforce_single_observable_per_location": true, 
     "height": 39, 
     "width": 39, 
     "debug": true, 
     "train_model": true, 
-    "num_episodes": 1000, 
+    "num_episodes": 5000, 
     "max_episode_length": 500, 
     "learning_rate": 0.1, 
     "exploration_rate": 0.1, 

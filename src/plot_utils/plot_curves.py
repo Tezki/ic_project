@@ -43,7 +43,7 @@ def read_automaton_learning_episodes(filename):
 def plot_curve(figure_id, num_episodes, moving_avg, learning_episodes, colour, label):
     plt.figure(figure_id)
     x_axis = range(1, num_episodes + 1)
-    plt.plot(x_axis, moving_avg, color=colour, label=label)
+    plt.plot(x_axis, moving_avg, color=colour, label=label, linewidth=0.5)
 
     for vl in learning_episodes:
         if vl <= num_episodes:
@@ -61,11 +61,11 @@ def save_reward_plot(figure_id, task_id, plot_title, output_filename_base, outpu
         plt.title(plot_title, fontsize=26)
     plt.xlabel("Number of episodes", fontsize=26)
     plt.ylabel("Average reward", fontsize=26)
-    plt.xticks(fontsize=26)
-    plt.yticks(fontsize=26)
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
     plt.ylim((0, REWARD_IF_GOAL + 0.1))
     plt.locator_params(nbins=6)
-    plt.legend(fontsize=16, ncol=2, loc="lower right")
+    plt.legend(fontsize=12, ncol=2, loc="lower right")
     output_filename = os.path.join(output_path, "{}_reward_{}".format(output_filename_base, task_id))
     plt.savefig(output_filename + ".png", bbox_inches='tight')
     plt.savefig(output_filename + ".pdf", bbox_inches='tight')
@@ -81,7 +81,7 @@ def save_steps_plot(figure_id, task_id, plot_title, max_steps, output_filename_b
     plt.yticks(fontsize=26)
     plt.ylim((0, max_steps + 5))
     plt.locator_params(nbins=6)
-    plt.legend(fontsize=16, ncol=2, loc="upper right")
+    plt.legend(fontsize=12, ncol=2, loc="upper right")
     output_filename = os.path.join(output_path, "{}_steps_{}".format(output_filename_base, task_id))
     plt.savefig(output_filename + ".png", bbox_inches='tight')
     plt.savefig(output_filename + ".pdf", bbox_inches='tight')

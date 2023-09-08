@@ -6,12 +6,12 @@ trans(u0,u1,V1) :- obs(V2,V1); eq(V2,ms); not rej_cond(V1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Pre-processing                          : 0.069s
-%% Hypothesis Space Generation             : 0.073s
-%% Conflict analysis                       : 62.718s
-%%   - Positive Examples                   : 62.718s
-%% Counterexample search                   : 0.165s
-%%   - CDOEs                               : 0.013s
-%%   - CDPIs                               : 0.158s
-%% Hypothesis Search                       : 5.828s
-%% Total                                   : 68.971s
+%% Hypothesis Space Generation             : 0.065s
+%% Conflict analysis                       : 37.512s
+%%   - Positive Examples                   : 37.512s
+%% Counterexample search                   : 0.138s
+%%   - CDOEs                               : 0.004s
+%%   - CDPIs                               : 0.134s
+%% Hypothesis Search                       : 3.261s
+%% Total                                   : 41.118s
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

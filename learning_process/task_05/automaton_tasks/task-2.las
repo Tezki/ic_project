@@ -62,7 +62,7 @@ bld(ms). bld(sc). bld(ch). bld(ml).
 }).
 
 #pos({}, {accept}, {
-    obs(sc, 0).
+    obs(pk, 0).
     last(0).
 }).
 
