@@ -9,5 +9,7 @@ from gym_subgoal_automata.envs.geoworld.geoworld_env import GeoWorldObstacleIsBu
 from gym_subgoal_automata.envs.geoworld.geoworld_env import GeoWorldObstacleIsNotBuildingEnv
 from gym_subgoal_automata.envs.geoworld.geoworld_env import GeoWorldLandmarkBuildingSequenceEnv
 from gym_subgoal_automata.envs.geoworld.geoworld_env import GeoWorldLandmarkSequenceWithRestrictionsEnv
+from gym_subgoal_automata.envs.geoworld.geoworld_env import GeoWorldBranchingEnv
+
 
 from gym_subgoal_automata.envs.geoworld.geoworld_env import GeoWorldTestEnv

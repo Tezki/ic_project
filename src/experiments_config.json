@@ -1,11 +1,11 @@
 {
-    "environments": ["task_06"
+    "environments": ["task_12"
                     ], 
     "task_generation_method": "random", 
     "num_tasks": 10, 
     "use_environment_seed": true, 
     "starting_environment_seed": 39, 
-    "folder_names": ["../learning_process/task_06"
+    "folder_names": ["../learning_process/task_12"
                     ],
     "enforce_single_observable_per_location": true, 
     "height": 39, 

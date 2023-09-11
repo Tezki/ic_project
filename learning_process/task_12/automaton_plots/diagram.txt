@@ -1,0 +1,12 @@
+digraph G {
+u0 [label="u0"];
+u1 [label="u1"];
+u_acc [label="u_acc"];
+u_rej [label="u_rej"];
+u0 -> u1 [label="obs(V2,V1); not bld(V2); not rej_cond(V1)"];
+u0 -> u_acc [label="obs(V2,V1); eq(V2,ms); not rej_cond(V1)"];
+u0 -> u_rej [label="obs(V2,V1); obt(V2)"];
+u1 -> u_acc [label="obs(V2,V1); bld(V2); not rej_cond(V1)"];
+u1 -> u_rej [label="obs(V2,V1); obt(V2)"];
+u_rej -> u_rej [label="obs(V2,V1); obt(V2)"];
+}

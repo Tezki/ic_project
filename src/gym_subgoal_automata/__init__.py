@@ -56,6 +56,11 @@ register(
 )
 
 register(
+    id='GeoWorldBranchingEnv-v0',
+    entry_point='gym_subgoal_automata.envs.geoworld:GeoWorldBranchingEnv',
+)
+
+register(
     id='GeoWorldTestEnv-v0',
     entry_point='gym_subgoal_automata.envs.geoworld:GeoWorldTestEnv',
 )

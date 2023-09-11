@@ -11,13 +11,20 @@
     "folders": [
       "../learning_process/task_11"
     ],
-    "colour": "#008000"
+    "colour": "#FFFF00"
+  },
+  {
+    "label": "task_12",
+    "folders": [
+      "../learning_process/task_12"
+    ],
+    "colour": "#00FFFF"
   },
   {
     "label": "task_06",
     "folders": [
       "../learning_process/task_06"
     ],
-    "colour": "#00FFFF"
+    "colour": "#EE82EE"
   }
 ]
